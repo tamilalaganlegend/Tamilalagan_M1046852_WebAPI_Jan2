@@ -146,25 +146,6 @@ namespace Employee_UnitTest_DataAccessLayer
                     Assert.AreEqual(exception.Message, "Id Not Found");
                 }
             }
-            //[TestMethod]
-            public void employeeAdd_NegativeTestCases_TestResult_NotFound()
-            {
-
-                //Assign
-                Mock_IEmployee_Repo.Setup(p => p.Add(employeeDetail()));
-                EmployeeRepo AssignResult = new EmployeeRepo(Mock_IEmployee_Repo.Object);
-                try
-                {
-                    //Act
-                    var ActResult = AssignResult.employeeAdd(new EmployeeDetails());
-                }
-                catch (NotFoundException exception)
-                {
-                    //Assert
-                    Assert.AreEqual(exception.Message, "Id Not Found");
-                }
-
-            }
             [TestMethod]
             public void employeeUpdate_NegativeTestCases_TestResult_NotFound()
             {
@@ -186,25 +167,6 @@ namespace Employee_UnitTest_DataAccessLayer
             /// <summary>
             /// Bad Request
             /// </summary>
-            //[TestMethod]
-            public void employeeGet_NegativeTestCases_TestResult_BadRequest()
-            {
-                //Assign
-                Task<List<EmployeeDetails>> employeeDetailsList = Employees_Mock_Positive();
-                Mock_IEmployee_Repo.Setup(x => x.Employee);
-                EmployeeRepo AssignResult = new EmployeeRepo(Mock_IEmployee_Repo.Object);
-
-                try
-                {
-                    //Act
-                    var ActResult = AssignResult.employeeGet();
-                }
-                catch (NotFoundException exception)
-                {
-                    //Assert
-                    Assert.AreEqual(exception.Message, "Id Not Found");
-                }
-            }
             [TestMethod]
             public void employeeGetId_NegativeTestCases_TestResult_BadRequest()
             {

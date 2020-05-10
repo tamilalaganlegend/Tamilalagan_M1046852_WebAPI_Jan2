@@ -151,22 +151,7 @@ namespace UnitTestProject
             //Assert
             Assert.ReferenceEquals(_actualReturnType, MockedReturn);
         }
-       
-        //[TestMethod]
-        public void addEmployeeDetails_NegativeTestCases_TestResult_NotFound()
-        {
-            //Assign
-            Mock_IEmployee_Bussiness.Setup(x => x.employeeDetailsB_Add(employeeDetail())).Throws<NotFoundException>();
-            EmployeeController AssignResult = new EmployeeController(Mock_IEmployee_Bussiness.Object);
-
-            //Act
-            var _actualReturnType = AssignResult.addEmployeeDetails(employeeDetail());
-            var MockedReturn = ReturnHttpResponse("No Records Found", HttpStatusCode.NotFound);
-
-            //Assert
-            Assert.ReferenceEquals(_actualReturnType, MockedReturn);
-        }
-       
+            
         [TestMethod]
         public void updateEmployeeDetails_NegativeTestCases_TestResult_NotFound()
         {
@@ -184,20 +169,6 @@ namespace UnitTestProject
         /// <summary>
         /// Bad Request
         /// </summary>
-        //[TestMethod]
-        public void getDetails_NegativeTestCases_TestResult_BadRequest()
-        {
-            //Assign
-            Mock_IEmployee_Bussiness.Setup(x => x.employeeDetailsB_Get()).Throws<BadRequestException>();
-            EmployeeController AssignResult = new EmployeeController(Mock_IEmployee_Bussiness.Object);
-
-            //Act
-            var _actualReturnType = AssignResult.getDetails();
-            var MockedReturn = ReturnHttpResponse("Input Not Valid", HttpStatusCode.BadRequest);
-
-            //Assert
-            Assert.ReferenceEquals(_actualReturnType, MockedReturn);
-        }
         [TestMethod]
         public void getDetailsId_NegativeTestCases_TestResult_BadRequest()
         {

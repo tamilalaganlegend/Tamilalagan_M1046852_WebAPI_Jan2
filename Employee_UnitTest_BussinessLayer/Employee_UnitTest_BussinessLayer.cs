@@ -143,25 +143,6 @@ namespace Employee_UnitTest_BussinessLayer
                 Assert.AreEqual(exception.Message, "Id Not Found");
             }
         }
-        //[TestMethod]
-        public void employeeDetailsB_Add_NegativeTestCases_TestResult_NotFound()
-        {
-
-            //Assign
-            Mock_IEmployee_Repo.Setup(p => p.employeeAdd(employeeDetail())).Returns(Employees_Mock_Positive());
-            Employee_Bussiness AssignResult = new Employee_Bussiness(Mock_IEmployee_Repo.Object);
-            try
-            {
-                //Act
-                var ActResult = AssignResult.employeeDetailsB_Add(new EmployeeDetails());
-            }
-            catch (NotFoundException exception)
-            {
-                //Assert
-                Assert.AreEqual(exception.Message, "Id Not Found");
-            }
-
-        }
         [TestMethod]
         public void employeeDetailsB_Update_NegativeTestCases_TestResult_NotFound()
         {
@@ -183,25 +164,6 @@ namespace Employee_UnitTest_BussinessLayer
         /// <summary>
         /// Bad Request
         /// </summary>
-        //[TestMethod]
-        public void employeeDetailsB_Get_NegativeTestCases_TestResult_BadRequest()
-        {
-            //Assign
-            Task<List<EmployeeDetails>> employeeDetailsList = Employees_Mock_Positive();
-            Mock_IEmployee_Repo.Setup(x => x.employeeGet()).Returns(employeeDetailsList);
-            Employee_Bussiness AssignResult = new Employee_Bussiness(Mock_IEmployee_Repo.Object);
-
-            try
-            {
-                //Act
-                var ActResult = AssignResult.employeeDetailsB_Get();
-            }
-            catch (NotFoundException exception)
-            {
-                //Assert
-                Assert.AreEqual(exception.Message, "Id Not Found");
-            }
-        }
         [TestMethod]
         public void employeeDetailsB_GetId_NegativeTestCases_TestResult_BadRequest()
         {
