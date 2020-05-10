@@ -4,12 +4,13 @@ using System;
 using System.Collections.Generic;
 using Employee_Entities.Contracts;
 using System.Threading.Tasks;
+using Custom_Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Employee_DataAccessLayer.ServiceManager
 {
     public class EmployeeRepo : IEmployeeRepo
     {
-        //public Employee_DBContext context = new Employee_DBContext();
         private readonly Employee_DBContext context;
         public EmployeeRepo(Employee_DBContext employee_DBContext)
         {
@@ -18,15 +19,18 @@ namespace Employee_DataAccessLayer.ServiceManager
 
         public async Task<List<EmployeeDetails>> employeeGet()
         {
-            //IEnumerable<EmployeeDetails> employeeDetailsGet = context.Employee;
             try
             {
                 List<EmployeeDetails> employeeDetailsGet = context.Employee.ToList();
-                if (employeeDetailsGet==null)
+                if (employeeDetailsGet.Count==0)
                 {
-                    throw new Exception("No Records Found");
+                    throw new NotFoundException("No Records Found");
                 }
                 return employeeDetailsGet;
+            }
+            catch (NotFoundException exception)
+            {
+                throw exception;
             }
             catch (Exception exception)
             {
@@ -40,9 +44,21 @@ namespace Employee_DataAccessLayer.ServiceManager
             {
                 if (employeeDetailsGet == null)
                 {
-                    throw new Exception("No Records Found");
+                    throw new BadRequestException("Input Not Valid");
+                }
+                if (employeeDetailsGet.Count == 0)
+                {
+                    throw new NotFoundException("No Records Found");
                 }
                 return employeeDetailsGet;
+            }
+            catch (NotFoundException exception)
+            {
+                throw exception;
+            }
+            catch (BadRequestException exception)
+            {
+                throw exception;
             }
             catch (Exception exception)
             {
@@ -55,10 +71,14 @@ namespace Employee_DataAccessLayer.ServiceManager
             {
                 if (employeeDetails == null)
                 {
-                    throw new ArgumentNullException();
+                    throw new BadRequestException("Input Not Valid");
                 }
                 var employeeDetail = await context.Employee.AddAsync(employeeDetails);
                 context.SaveChanges();
+            }
+            catch (BadRequestException exception)
+            {
+                throw exception;
             }
             catch (Exception exception)
             {
@@ -70,11 +90,38 @@ namespace Employee_DataAccessLayer.ServiceManager
         {
             try
             {
-                if (employeeDetails != null)
+                if (employeeDetails == null)
                 {
-                    context.Employee.Update(employeeDetails);
-                    await context.SaveChangesAsync();
+                    throw new BadRequestException("Input Not Valid");
                 }
+                var findEmployeeId = context.Employee.Where(x => x.Id == employeeDetails.Id).FirstOrDefault();
+
+                if (findEmployeeId != null)
+                {
+                    findEmployeeId.Username = employeeDetails.Username;
+                    findEmployeeId.DateOfBirth = employeeDetails.DateOfBirth;
+                    findEmployeeId.EmailId = employeeDetails.EmailId;
+                    findEmployeeId.FullName = employeeDetails.FullName;
+                    findEmployeeId.Gender = employeeDetails.Gender;
+                    findEmployeeId.Password = employeeDetails.Password;
+                    findEmployeeId.SecurityAnswer = employeeDetails.SecurityAnswer;
+                    findEmployeeId.SecurityQuestion = employeeDetails.SecurityQuestion;
+
+                    context.Entry(findEmployeeId).State = EntityState.Modified;
+                    context.SaveChanges();
+                }
+                else
+                {
+                    throw new NotFoundException("No Records Found");
+                }
+            }
+            catch (NotFoundException exception)
+            {
+                throw exception;
+            }
+            catch (BadRequestException exception)
+            {
+                throw exception;
             }
             catch (Exception exception)
             {
@@ -85,15 +132,25 @@ namespace Employee_DataAccessLayer.ServiceManager
         {
             try
             {
-                var findEmployeeId = context.Employee.FirstOrDefault(d => d.Id == empId);
+                if (empId==null)
+                {
+                    throw new BadRequestException("Input Not Valid");
+                }
+                var findEmployeeId = context.Employee.Where(x => x.Id == empId).FirstOrDefault(); 
                 if (findEmployeeId == null)
                 {
-                    throw new Exception("No Records Found");
+                    throw new NotFoundException("No Records Found");
                 }
-
                 context.Employee.Remove(findEmployeeId);
                 context.SaveChanges();
-
+            }
+            catch (NotFoundException exception)
+            {
+                throw exception;
+            }
+            catch (BadRequestException exception)
+            {
+                throw exception;
             }
             catch (Exception exception)
             {

@@ -8,6 +8,7 @@ using Custom_Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using Newtonsoft.Json.Serialization;
 
 namespace Employee_Controllers.Controllers
 {
@@ -16,7 +17,6 @@ namespace Employee_Controllers.Controllers
     public class EmployeeController : ControllerBase
     {
 
-        //public Employee_Bussiness context = new Employee_Bussiness();
         private readonly IEmployee_Bussiness context;
 
         public EmployeeController(IEmployee_Bussiness employee_bussiness)
@@ -40,11 +40,20 @@ namespace Employee_Controllers.Controllers
             try
             {
                 IEnumerable<EmployeeDetails> employeeDetails = await context.employeeDetailsB_Get();
-                return Ok(employeeDetails);
+                if (employeeDetails == null)
+                {
+                    throw new NotFoundException("No Records Found");
+                }
+                string response = JsonConvert.SerializeObject(employeeDetails, new JsonSerializerSettings
+                {
+                    ContractResolver = new DefaultContractResolver(),
+                    Formatting = Formatting.Indented
+                });
+                return ReturnHttpResponse(response, HttpStatusCode.OK);
             }
-            catch (BadRequestException exception)
+            catch(NotFoundException exception)
             {
-                return ReturnHttpResponse(exception.Message, HttpStatusCode.BadRequest);
+                return ReturnHttpResponse(exception.Message, HttpStatusCode.NotFound);
             }
             catch (Exception exception)
             {
@@ -62,16 +71,30 @@ namespace Employee_Controllers.Controllers
         {
             try
             {
-                IEnumerable<EmployeeDetails> employeeDetails = await context.employeeDetailsB_GetId(empId);
                 if (empId == null)
                 {
-                    throw new ArgumentNullException();
+                    throw new BadRequestException("Input Not Valid");
                 }
-                return Ok(employeeDetails);
+                IEnumerable<EmployeeDetails> employeeDetails = await context.employeeDetailsB_GetId(empId);
+
+                if (employeeDetails == null)
+                {
+                    throw new NotFoundException("No Records Found");
+                }
+                string response = JsonConvert.SerializeObject(employeeDetails, new JsonSerializerSettings
+                {
+                    ContractResolver = new DefaultContractResolver(),
+                    Formatting = Formatting.Indented
+                });
+                return ReturnHttpResponse(response, HttpStatusCode.OK);
             }
             catch (BadRequestException exception)
             {
                 return ReturnHttpResponse(exception.Message, HttpStatusCode.BadRequest);
+            }
+            catch (NotFoundException exception)
+            {
+                return ReturnHttpResponse(exception.Message, HttpStatusCode.NotFound);
             }
             catch (Exception exception)
             {
@@ -84,14 +107,14 @@ namespace Employee_Controllers.Controllers
         }
 
         [HttpDelete]
-        [Route("deleteEmp/{id}")]
+        [Route("deleteEmp/{empId}")]
         public async Task<IActionResult> deleteEmployeeId(int empId)
         {
             try
             {
                 if (empId == null)
                 {
-                    throw new ArgumentNullException();
+                    throw new BadRequestException("Input Not Valid");
                 }
                 if (ModelState.IsValid)
                 {
@@ -106,6 +129,10 @@ namespace Employee_Controllers.Controllers
             catch (BadRequestException exception)
             {
                 return ReturnHttpResponse(exception.Message, HttpStatusCode.BadRequest);
+            }
+            catch (NotFoundException exception)
+            {
+                return ReturnHttpResponse(exception.Message, HttpStatusCode.NotFound);
             }
             catch (Exception exception)
             {
@@ -125,7 +152,7 @@ namespace Employee_Controllers.Controllers
             {
                 if (employeeDetails == null)
                 {
-                    throw new ArgumentNullException();
+                    throw new BadRequestException("Input Not Valid");
                 }
                 if (ModelState.IsValid)
                 {
@@ -133,7 +160,7 @@ namespace Employee_Controllers.Controllers
                 }
                 string response = JsonConvert.SerializeObject(new JObject
                     {
-                        new JProperty("Message","Added Successfully")
+                        new JProperty("Message","Employee data inserted successfully")
                     });
                 return ReturnHttpResponse(response, HttpStatusCode.OK);
             }
@@ -159,7 +186,7 @@ namespace Employee_Controllers.Controllers
             {
                 if (employeeDetails == null)
                 {
-                    throw new ArgumentNullException();
+                    throw new BadRequestException("Input Not Valid");
                 }
                 if (ModelState.IsValid)
                 {
@@ -174,6 +201,10 @@ namespace Employee_Controllers.Controllers
             catch (BadRequestException exception)
             {
                 return ReturnHttpResponse(exception.Message, HttpStatusCode.BadRequest);
+            }
+            catch (NotFoundException exception)
+            {
+                return ReturnHttpResponse(exception.Message, HttpStatusCode.NotFound);
             }
             catch (Exception exception)
             {

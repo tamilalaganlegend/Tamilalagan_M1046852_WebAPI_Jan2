@@ -9,7 +9,6 @@ namespace Employee_BussinessLayer
 {
     public class Employee_Bussiness : IEmployee_Bussiness
     {
-        //public EmployeeRepo context = new EmployeeRepo();
         private readonly IEmployeeRepo context;
         public Employee_Bussiness(IEmployeeRepo employeerepo)
         {
@@ -20,11 +19,15 @@ namespace Employee_BussinessLayer
             List<EmployeeDetails> employeeDetails = await context.employeeGet();
             try
             {
-                if(employeeDetails==null)
+                if(employeeDetails.Count==0)
                 {
-                    throw new BadRequestException("No Records Found");
+                    throw new NotFoundException("No Records Found");
                 }
                 return employeeDetails;
+            }
+            catch(NotFoundException exception)
+            {
+                throw exception;
             }
             catch(Exception exception)
             {
@@ -36,10 +39,22 @@ namespace Employee_BussinessLayer
             List<EmployeeDetails> employeeDetails = await context.employeeGetId(empId);
             try
             {
-                if (employeeDetails == null)
+                if (employeeDetails.Count == 0)
                 {
-                    throw new BadRequestException("No Records Found");
+                    throw new NotFoundException("No Records Found");
                 }
+                if(empId == null)
+                {
+                    throw new BadRequestException("Input Not Valid");
+                }
+            }
+            catch (NotFoundException exception)
+            {
+                throw exception;
+            }
+            catch (BadRequestException exception)
+            {
+                throw exception;
             }
             catch (Exception exception)
             {
@@ -53,9 +68,17 @@ namespace Employee_BussinessLayer
             {
                 if (empId == null)
                 {
-                    throw new ArgumentNullException();
+                    throw new BadRequestException("Input Not Valid");
                 }
                 await context.employeeDelete(empId);
+            }
+            catch (NotFoundException exception)
+            {
+                throw exception;
+            }
+            catch (BadRequestException exception)
+            {
+                throw exception;
             }
             catch (Exception exception)
             {
@@ -68,9 +91,13 @@ namespace Employee_BussinessLayer
             {
                 if (employeeDetails == null)
                 {
-                    throw new ArgumentNullException();
+                    throw new BadRequestException("Input Not Valid");
                 }
                 await context.employeeAdd(employeeDetails);
+            }
+            catch (BadRequestException exception)
+            {
+                throw exception;
             }
             catch (Exception exception)
             {
@@ -83,9 +110,17 @@ namespace Employee_BussinessLayer
             {
                 if (employeeDetails == null)
                 {
-                    throw new ArgumentNullException();
+                    throw new BadRequestException("Input Not Valid");
                 }
                 await context.employeeUpdate(employeeDetails);
+            }
+            catch (NotFoundException exception)
+            {
+                throw exception;
+            }
+            catch (BadRequestException exception)
+            {
+                throw exception;
             }
             catch (Exception exception)
             {
